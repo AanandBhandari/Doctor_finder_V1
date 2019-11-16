@@ -16,11 +16,11 @@ const hospitalSchema = new mongoose.Schema({
     trim: true,
     required: true
   },
-  currentCity: {
+  address: {
     type: String,
     trim: true
   },
-  geolocation: {
+  location: {
     type: pointSchema
   },
   email: {
@@ -46,16 +46,10 @@ const hospitalSchema = new mongoose.Schema({
   isRegistred: {
     type: Boolean
   },
-  created: {
+  createdAt: {
     type: Date,
     default: Date.now
-  },
-  doctors: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "doctors"
-    }
-  ]
+  }
 });
 
 // index on location and let mongoDB know we are using a “2dsphere”.
@@ -91,13 +85,11 @@ hospitalSchema.pre('save', function (next) {
 hospitalSchema.statics.findByCredentials = async function (email, password) {
     let Hospital = this;
     const hospital = await Hospital.findOne({ email })
-    if (hospital) {
-        let passwordData = sha512(password, hospital.salt)
-        if (passwordData.passwordHash == hospital.password) {
-            return hospital
-        }
+    if(!hospital) return ''
+    let passwordData = sha512(password, hospital.salt)
+    if (passwordData.passwordHash == hospital.password) {
+        return hospital
     }
-    throw 'Invalid email or password'
 }
 
 module.exports = mongoose.model("Hospital", hospitalSchema);

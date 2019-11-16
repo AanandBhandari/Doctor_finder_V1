@@ -20,14 +20,15 @@ app.use(expressValidator());
 // console.log(expressValidator);
 app.use(express.static("public"));
 
-// Routes
+// get api endpoints
 app.get("/", (req, res) => {
-    res.redirect("/api/users");
+    const apiRequest = require('./helpers/apiRequest')
+    res.json(apiRequest());
 });
 
 // api routes middleware
 app.use("/api", require('./routes/hospital/auth'));
-// app.use("/api", require('./routes/doctor/doctor'));
+app.use("/api", require('./routes/hospital/hospital'));
 // app.use("/api", require('./routes/user/auth'));
 // app.use("/api", require('./routes/user/user'));
 

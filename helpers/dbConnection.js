@@ -6,7 +6,8 @@ module.exports = () => {
         .connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useCreateIndex: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useFindAndModify: false
         })
         .then(() => console.log("DB Connected"))
         .catch(err => {
