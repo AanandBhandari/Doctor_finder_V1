@@ -47,3 +47,18 @@ exports.passwordResetValidator = (req, res, next) => {
  // proceed to next middleware
  next();
 };
+
+exports.validateGeolocation = async (req, res, next) => {
+    let error = []
+    const { long, lat } = req.query
+    if (long <= -180 || long >= 180) {
+        error.push('Invalid longtitude')
+    }
+    if (lat <= -90 || lat >= 90) {
+        error.push('Invalid latitude')
+    }
+    if (error.length > 0) {
+        return res.status(400).json({ error:error[0] })
+    }
+    next();
+}

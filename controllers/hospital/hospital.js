@@ -43,3 +43,15 @@ exports.updateProfile = async (req, res) => {
         res.json(profile)
     }
 }
+
+// add location
+exports.addLocation = async (req, res) => {
+        const { long, lat } = req.query
+        location = {
+            type: "Point",
+            coordinates: [long, lat]
+        }
+        req.profile.location = location
+        const result = await req.profile.save()
+        res.json(result.location);
+}

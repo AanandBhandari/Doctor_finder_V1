@@ -7,7 +7,7 @@ require("dotenv").config();
 const app = express();
 
 // Import helper methods
-const {dbConnection, errorHandler } = require("./helpers");
+const {dbConnection, apiRequest } = require("./helpers");
 
 // Database Connection
 dbConnection();
@@ -22,14 +22,13 @@ app.use(express.static("public"));
 
 // get api endpoints
 app.get("/", (req, res) => {
-    const apiRequest = require('./helpers/apiRequest')
     res.json(apiRequest());
 });
 
 // api routes middleware
 app.use("/api", require('./routes/hospital/auth'));
 app.use("/api", require('./routes/hospital/hospital'));
-// app.use("/api", require('./routes/user/auth'));
+app.use("/api", require('./routes/doctor/doctor'));
 // app.use("/api", require('./routes/user/user'));
 
 // Error handling middleware

@@ -33,6 +33,13 @@ module.exports = () => {
                    "header": {
                        "x-auth-token": "token_value"
                    }
+               },
+               "addGeoLocation": {
+                   "method": "PUT",
+                   "URL": "http://localhost:3001/api/hospital/profile/:id?long=123&lat=534",
+                   "header": {
+                       "x-auth-token": "token_value"
+                   }
                }
            }
        }

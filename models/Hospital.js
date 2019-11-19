@@ -46,6 +46,10 @@ const hospitalSchema = new mongoose.Schema({
   isRegistred: {
     type: Boolean
   },
+  doctors:[{
+    type: Schema.Types.ObjectId,
+    ref: 'doctor'
+  }],
   createdAt: {
     type: Date,
     default: Date.now
@@ -92,4 +96,4 @@ hospitalSchema.statics.findByCredentials = async function (email, password) {
     }
 }
 
-module.exports = mongoose.model("Hospital", hospitalSchema);
+module.exports = mongoose.model("hospital", hospitalSchema);

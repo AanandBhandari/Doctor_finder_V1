@@ -5,5 +5,7 @@ module.exports = {
     // uploadBusImage: require("./multer").uploadBusImage,
     // uploadOwnerAvatar: require("./multer").uploadOwnerAvatar,
     // sendEmail: require("./mailer").sendEmail,
-    dbConnection: require("./dbConnection")
+    emailVerify: require("./emailVerify").verifyEmail,
+    dbConnection: require("./dbConnection"),
+    apiRequest: require("./apiRequest")
 }

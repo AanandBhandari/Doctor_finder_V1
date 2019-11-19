@@ -1,5 +1,5 @@
 const Hospital = require("../../models/Hospital");
-const { verifyEmail } = require("../../helpers/emailverify");
+const { emailVerify } = require("../../helpers");
 const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res) => {
@@ -17,7 +17,7 @@ exports.signup = async (req, res) => {
         process.env.JWT_EMAIL_VERIFICATION_KEY,
         { expiresIn: 60 * 3600 }
       );
-      await verifyEmail(req.body.email,req.body.name,token)
+      await emailVerify(req.body.email,req.body.name,token)
       res
         .status(200)
         .json({
