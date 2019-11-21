@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-exports.verifyEmail = async (email, name, token) => {
+exports.verifyEmail = async (email, name, token, to) => {
   let transporter = nodemailer.createTransport({
     // service: "gmail",
     host: "smtp.gmail.com",
@@ -16,7 +16,7 @@ exports.verifyEmail = async (email, name, token) => {
     to: email,
     subject: "email verification",
     html: `<p>Hi, ${name} . </p></br>
-                    <a href="${process.env.EMAIL_REDIRECT_LINK}/api/hospital/emailVerify?id=${token}">Click me to register your account</a>`
+                    <a href="${process.env.EMAIL_REDIRECT_LINK}/api/${to}/emailVerify?id=${token}">Click me to register your account</a>`
   };
   return await transporter.sendMail(mailOptions);
 };

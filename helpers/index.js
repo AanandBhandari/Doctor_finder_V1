@@ -3,7 +3,7 @@ module.exports = {
     // checkDateAvailability: require("./misc").checkDateAvailability,
     // errorHandler: require("./dbErrorHandler").errorHandler,
     // uploadBusImage: require("./multer").uploadBusImage,
-    // uploadOwnerAvatar: require("./multer").uploadOwnerAvatar,
+    uploadDoctorPhoto: require("./multer").uploadDoctorPhoto,
     // sendEmail: require("./mailer").sendEmail,
     emailVerify: require("./emailVerify").verifyEmail,
     dbConnection: require("./dbConnection"),

@@ -16,16 +16,20 @@ exports.getProfile = async(req,res) => {
 // create profile
 exports.createProfile = async(req,res) => {
     const {address,website,phoneno} = req.body
-    let profile =await Hospital.findById(req.hospital._id)
+    let profile =await Hospital.findOne({_id:req.hospital._id, address})
+    if (profile) {
+        return res.status(403).json({
+          error: "Profile is already added!"
+        });
+    }
+    profile = {}
     profile.address = address
     profile.website = website
     profile.phoneno = phoneno
     profile = await profile.save()
-    if (profile) {
-        profile.salt = undefined
-        profile.password = undefined
-        res.json(profile)
-    }
+    profile.salt = undefined
+    profile.password = undefined
+    res.json(profile)
 }
 // update profile
 exports.updateProfile = async (req, res) => {

@@ -14,11 +14,11 @@ dbConnection();
 
 // Middlewares
 app.use(cors());
+app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(expressValidator());
 // console.log(expressValidator);
-app.use(express.static("public"));
 
 // get api endpoints
 app.get("/", (req, res) => {
@@ -28,6 +28,7 @@ app.get("/", (req, res) => {
 // api routes middleware
 app.use("/api", require('./routes/hospital/auth'));
 app.use("/api", require('./routes/hospital/hospital'));
+app.use("/api", require('./routes/doctor/auth'));
 app.use("/api", require('./routes/doctor/doctor'));
 // app.use("/api", require('./routes/user/user'));
 

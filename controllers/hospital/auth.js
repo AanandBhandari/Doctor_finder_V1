@@ -17,7 +17,7 @@ exports.signup = async (req, res) => {
         process.env.JWT_EMAIL_VERIFICATION_KEY,
         { expiresIn: 60 * 3600 }
       );
-      await emailVerify(req.body.email,req.body.name,token)
+      await emailVerify(req.body.email,req.body.name,token,'hospital')
       res
         .status(200)
         .json({
@@ -32,7 +32,7 @@ exports.signup = async (req, res) => {
             { $unset: { isRegistred: "" } },
             { multi: false }
           ));
-      }, 1000*60);
+      }, 1000*60*5);
   } catch (error) {
     res
       .status(500)
