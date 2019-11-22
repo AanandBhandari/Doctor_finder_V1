@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         trim: true,
         required: true
     },
-    currentCity: {
+    address: {
         type: String
     },
     location: {
@@ -28,7 +28,8 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     gender: {
         type: String,
@@ -45,17 +46,20 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     phoneno: {
-        type: Number
+        type: Number,
+        unique: true
     },
     created: {
         type: Date,
         default: Date.now
     },
     isRegistred: {
-        type: Boolean
+        type: Boolean,
+        default : false
     }
 })
 
+userSchema.index({ location: "2dsphere" });
 
 const sha512 = function (password, salt) {
     let hash = crypto.createHmac('sha512', salt);

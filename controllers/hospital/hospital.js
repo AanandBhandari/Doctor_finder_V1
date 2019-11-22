@@ -1,6 +1,8 @@
 const Hospital = require("../../models/Hospital");
 exports.profile = async(req,res, next) => {
-    const hospital =await Hospital.findById(req.params.id).select("name _id email address location phoneno website")
+    const hospital = await Hospital.findById(req.params.id).select(
+      "-password -salt"
+    );
     if (!hospital) {
         return res.status(400).json({error:'Hospital not found with this id'})
     }
@@ -22,7 +24,7 @@ exports.createProfile = async(req,res) => {
           error: "Profile is already added!"
         });
     }
-    profile = {}
+    profile = await Hospital.findOne({ _id: req.hospital._id });
     profile.address = address
     profile.website = website
     profile.phoneno = phoneno
@@ -40,12 +42,8 @@ exports.updateProfile = async (req, res) => {
     profile.phoneno = phoneno
     profile.email = email
     profile.name = name
-    profile = await profile.save()
-    if (profile) {
-        profile.salt = undefined
-        profile.password = undefined
-        res.json(profile)
-    }
+    await profile.save()
+    res.json(profile)
 }
 
 // add location

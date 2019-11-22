@@ -30,7 +30,8 @@ app.use("/api", require('./routes/hospital/auth'));
 app.use("/api", require('./routes/hospital/hospital'));
 app.use("/api", require('./routes/doctor/auth'));
 app.use("/api", require('./routes/doctor/doctor'));
-// app.use("/api", require('./routes/user/user'));
+app.use("/api", require('./routes/user/auth'));
+app.use("/api", require('./routes/user/user'));
 
 // Error handling middleware
 app.use(function (err, req, res, next) {
