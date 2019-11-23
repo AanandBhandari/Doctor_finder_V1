@@ -6,7 +6,8 @@ const {
   createProfile,
   getProfile,
   updateProfile,
-  addLocation
+  addLocation,
+  postReview
 } = require("../../controllers/user/user");
 const { validateGeolocation } = require("../../validator/index");
 
@@ -21,6 +22,13 @@ router.put(
   hasAuthorization,
   addLocation
 );
+
+// take appointment
+
+
+// user reviews doctor
+router.route("/user/review/:id")
+      .post(auth,hasAuthorization,postReview)
 // delete user account soon...
 router.param("id", profile);
 module.exports = router;

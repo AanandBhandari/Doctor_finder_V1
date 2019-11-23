@@ -48,10 +48,7 @@ exports.auth = async (req, res, next) => {
     if (token) {
       let user = await parseToken(token);
       if (user._id) {
-        user = await User.findById(user._id);
-        console.log(user);
-        user.salt = undefined;
-        user.password = undefined;
+        user = await User.findById(user._id).select('-password -salt')
         if (user) {
           req.user = user;
           return next();

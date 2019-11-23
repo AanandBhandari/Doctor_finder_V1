@@ -1,14 +1,17 @@
 const express = require('express')
 const router = express.Router()
 const { hasAuthorization, auth } = require('../../controllers/doctor/auth')
-const { createProfile,getProfile,updateProfile, profile, addWorkexp,removeWorkExp,addEdu,removeEdu,addAwards,removeAwards,addTraining,removeTraining} = require('../../controllers/doctor/doctor')
+const { createProfile,getProfile,updateProfile, profile, addWorkexp,removeWorkExp,addEdu,removeEdu,addAwards,removeAwards,addTraining,removeTraining, getDoctors,availability} = require('../../controllers/doctor/doctor')
 const { validateData } = require("../../validator/index");
 const {uploadDoctorPhoto} = require('../../helpers')
 
 // docotor profile
-router.route("/doctor/profile/:id")
-    .get(getProfile)
-    .put(auth, hasAuthorization, uploadDoctorPhoto,updateProfile);
+router
+  .route("/doctor/profile/:id")
+  .get(getProfile)
+  .put(auth, hasAuthorization, uploadDoctorPhoto, updateProfile)
+  .patch(auth, hasAuthorization, availability);//filps the availability
+router.get('/doctor/getdoctors',getDoctors)
 
 router.put('/doctor/profile', auth, uploadDoctorPhoto,createProfile)
 

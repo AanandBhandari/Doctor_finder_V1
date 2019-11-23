@@ -1,4 +1,6 @@
 const User = require("../../models/User");
+const Doctor = require("../../models/Doctor");
+const Review = require("../../models/Review");
 exports.profile = async (req, res, next) => {
   const user = await User.findById(req.params.id).select("-password -salt");
   if (!user) {
@@ -16,14 +18,13 @@ exports.getProfile = async (req, res) => {
 // create profile
 exports.createProfile = async (req, res) => {
   const { address, dob, phoneno } = req.body;
-  console.log('hello');
   let profile = await User.findOne({ _id: req.user._id, phoneno });
   if (profile) {
     return res.status(403).json({
       error: "Profile is already added!"
     });
   }
-  profile = await User.findOne({ _id: req.user._id });
+  profile = req.user
   profile.address = address;
   profile.dob = dob;
   profile.phoneno = phoneno;
@@ -36,12 +37,12 @@ exports.createProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   const { address, dob, phoneno, email, name, lastname } = req.body;
   let profile = req.profile;
-  profile.address = address;
-  profile.dob = dob;
-  profile.phoneno = phoneno;
-  profile.email = email;
-  profile.name = name;
-  profile.lastname = lastname;
+  address && (profile.address = address);
+  dob && (profile.dob = dob);
+  phoneno && (profile.phoneno = phoneno);
+  email && (profile.email = email);
+  name && (profile.name = name);
+  lastname && (profile.lastname = lastname);
   await profile.save();
     res.json(profile);
 };
@@ -57,3 +58,12 @@ exports.addLocation = async (req, res) => {
   const result = await req.profile.save();
   res.json(result.location);
 };
+
+// review a doctor
+exports.postReview = async(req,res) => {
+  const doctor = await Doctor.findById(req.query.d_id)
+  if (!doctor) {
+    return res.status(400).json({ error: "Doctor not found with this id" });
+  }
+  
+}

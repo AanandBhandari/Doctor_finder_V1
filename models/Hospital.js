@@ -71,10 +71,10 @@ hospitalSchema.pre('save', function (next) {
     let hospital = this;
     if (hospital.isModified('password')) {
         // salt
-        const ranStr = function () {
+        const ranStr = function (n) {
             return crypto.randomBytes(Math.ceil(8))
                 .toString('hex')
-                .slice(0, 16);
+                .slice(0, n);
         };
         // applying sha512 alogrithm
         let salt = ranStr(16);

@@ -106,6 +106,10 @@ const doctorSchema = new mongoose.Schema({
   isRegistred: {
     type: Boolean
   },
+  isAvailable: {
+    type: Boolean,
+    default: false
+  },
   password: {
     type: String,
     required: true
@@ -127,10 +131,10 @@ doctorSchema.pre('save', function (next) {
     let doctor = this;
     if (doctor.isModified('password')) {
         // salt
-        const ranStr = function () {
+        const ranStr = function (n) {
             return crypto.randomBytes(Math.ceil(8))
                 .toString('hex')
-                .slice(0, 16);
+                .slice(0, n);
         };
         // applying sha512 alogrithm
         let salt = ranStr(16);

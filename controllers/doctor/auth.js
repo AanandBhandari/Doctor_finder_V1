@@ -91,9 +91,7 @@ exports.auth = async (req, res, next) => {
         if (token) {
             const user = await parseToken(token)
             if (user._id) {
-                const doctor = await Doctor.findById(user._id)
-                doctor.salt = undefined
-                doctor.password = undefined
+                const doctor = await Doctor.findById(user._id).select('-password -salt')
                 if (doctor) {
                     req.doctor = doctor
                     return next();

@@ -35,7 +35,7 @@ exports.createProfile = async (req, res) => {
       fs.unlinkSync(req.file.path);
       req.body.image = "doctor/resized/" + image;
     }
-    profile = await Doctor.findOne({ _id: req.doctor._id });
+    profile = req.doctor
     profile.professionaltitle = professionaltitle
     profile.specialities = specialities
     profile.image = req.body.image
@@ -46,7 +46,6 @@ exports.createProfile = async (req, res) => {
 }
 // update profile
 exports.updateProfile = async (req, res) => {
-    console.log('he');
     const { professionaltitle, specialities } = req.body;
     if (req.file !== undefined) {
       const { filename: image } = req.file;
@@ -55,7 +54,6 @@ exports.updateProfile = async (req, res) => {
         .resize(300)
         .jpeg({ quality: 100 })
         .toFile(path.resolve(req.file.destination, "resized", image))
-        console.log('hello');
       fs.unlinkSync(req.file.path);
       req.body.image = "doctor/resized/" + image;
     }
@@ -138,4 +136,22 @@ exports.removeAwards = async(req,res) => {
     profile.awards.splice(removeIndex,1);
     await profile.save();
     res.json(profile);
+}
+
+// get Doctors
+exports.getDoctors = async(req,res) => {
+    const doctors = await Doctor.find({}).select(
+      "_id name lastname email professionaltitle image specialities"
+    );
+    if(!doctors) {
+        return res.status(400).json({error:" No doctors available"})
+    }
+    res.json(doctors)
+}
+
+exports.availability = async(req,res) => {
+    req.profile.isAvailable = !req.profile.isAvailable;
+    const a = req.profile
+    await a.save()
+    res.json(a.isAvailable)
 }

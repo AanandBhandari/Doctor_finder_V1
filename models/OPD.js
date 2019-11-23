@@ -35,7 +35,6 @@ const opdSchema = new mongoose.Schema({
     },
     isAvailable: {
         type: Boolean,
-        required: true,
         default: false
     },
     timeslot: {

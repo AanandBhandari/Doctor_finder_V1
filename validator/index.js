@@ -21,7 +21,7 @@ exports.signupValidator = (req, res, next) => {
  // if error show the first one as they happen
  if (errors) {
      const firstError = errors.map(error => error.msg)[0];
-     return res.status(400).json({ error: firstError });
+     return res.status(422).json({ error: firstError });
  }
  // proceed to next middleware
  next();
@@ -58,26 +58,48 @@ exports.validateGeolocation = async (req, res, next) => {
         error.push('Invalid latitude')
     }
     if (error.length > 0) {
-        return res.status(400).json({ error:error[0] })
+        return res.status(422).json({ error:error[0] })
     }
     next();
 }
 exports.validateData = async(req,res,next) => {
     req.check("title", "Title is required")
-      .not()
-      .isEmpty(),
-      req.check("address", "Address is required")
-        .not()
-        .isEmpty(),
-      req.check("year", "Year is required")
-        .not()
-        .isEmpty();
+      .notEmpty()
+    req.check("address", "Address is required")
+    .notEmpty()
+    req.check("year", "Year is required")
+    .notEmpty()
     const errors = req.validationErrors();
     // if error show the first one as they happen
     if (errors) {
     const firstError = errors.map(error => error.msg)[0];
-    return res.status(400).json({ error: firstError });
+    return res.status(422).json({ error: firstError });
     }
     // proceed to next middleware
     next();
+}
+
+exports.validateOPD = async(req,res,next) => {
+     req
+       .check("startdayofweek", "Startdayofweek is not valid")
+       .notEmpty()
+       .isIn(["sun", "mon","tue", "wed","thu","fri","sat"])
+    req
+        .check("enddayofweek", "Enddayofweek is not valid")
+        .notEmpty()
+        .isIn(["sun", "mon", "tue", "wed", "thu", "fri", "sat"])
+    req
+        .check("starttime", "Start time is required")
+        .notEmpty()
+    req.check("endtime", "End time is required").notEmpty()
+    req.check("timeslot", "Timeslot is not valid").notEmpty().isInt()
+    req.check("consultfee", "Consult fee is not valid").notEmpty().isInt()
+    const errors = req.validationErrors();
+     // if error show the first one as they happen
+     if (errors) {
+       const firstError = errors.map(error => error.msg)[0];
+       return res.status(422).json({ error: firstError });
+     }
+     // proceed to next middleware
+     next();
 }
