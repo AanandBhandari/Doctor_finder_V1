@@ -11,6 +11,7 @@ const {
   deleteOPD,
   getOPD,
   getOPDs,
+  getOPDByDoctor,
   availability
 } = require("../../controllers/hospital/hospital");
 const {
@@ -26,11 +27,12 @@ router.put('/hospital/addGeoLocation/:id/', validateGeolocation, auth, hasAuthor
 // delete hospital account soon...
 
 // OPD 
+router.get('/getOPDByDoctor',getOPDByDoctor)//?d_id nd route hit by user
 router
   .route("/hospital/opd/:id")
   .post(validateOPD, auth, setOPD) // hospitalle search garcha dr lai ani add to opd garcha then OPd schedule create garcha..
+  .get(auth, getOPD)//?opd_id
   .delete(auth, hasAuthorization, deleteOPD) //?opd_id
-  .get(auth, hasAuthorization, getOPD)
   .patch(auth, hasAuthorization, availability);
 router.get('/hospital/opds/:id',auth,hasAuthorization,getOPDs)
 

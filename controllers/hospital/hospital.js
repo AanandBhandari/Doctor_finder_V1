@@ -67,14 +67,49 @@ exports.setOPD = async(req,res) => {
         return res.status(400).json({error: 'Doctor not found'})
     }
     if (!doctor.isAvailable) {
-        return res.status(400).json({ error: "Doctor is not Available" });
+        return res.status(400).json({ error: "Doctor is not available at the moment" });
     }
-    let newOPD = req.body
-    newOPD.doctor = doctor._id
-    newOPD.hospital = req.hospital._id
-    newOPD = new OPD(newOPD)
-    newOPD = await newOPD.save()
-    res.json(newOPD)
+    const opds = await OPD.find({doctor: doctor._id})
+    // checks for available time span
+    if(opds.length >= 1) {
+      let isAvailable = false;
+      // function calculateDiff(starttime,endtime) {
+      //   let timeStart = new Date("01/01/2019 " + starttime);
+      //   let timeEnd = new Date("01/01/2019 " + endtime);
+      //   let diff = (timeEnd - timeStart) / 60000;
+      //   let minutes = diff % 60;
+      //   let hours = (diff - minutes) / 60;
+      //   console.log(hours);
+      //   return hours
+      // }
+      for (let i = 0; i < opds.length; i++) {
+        let opd = opds[i];
+         isAvailable =
+           ((+req.body.starttime > opd.starttime &&
+             +req.body.starttime > opd.endtime) ||
+           (+req.body.endtime < opd.starttime &&
+             +req.body.endtime < opd.endtime));  
+              
+      }
+      
+      console.log(isAvailable);
+      if (isAvailable) {
+        let newOPD = req.body
+        newOPD.doctor = doctor._id
+        newOPD.hospital = req.hospital._id
+        newOPD = new OPD(newOPD)
+        newOPD = await newOPD.save()
+        return res.json(newOPD)
+      } else {
+        return res.status(400).json({ error: "Time span is not available" });
+      }
+    }
+    let newOPD = req.body;
+    newOPD.doctor = doctor._id;
+    newOPD.hospital = req.hospital._id;
+    newOPD = new OPD(newOPD);
+    newOPD = await newOPD.save();
+    res.json(newOPD);
 }
 
 // delete OPD
@@ -98,11 +133,7 @@ exports.getOPD = async(req,res) => {
     if (!opd) {
       return res.status(404).json({ error: "OPD not found" });
     }
-    if (opd.hospital.toString() !== req.hospital._id.toString()) {
-      return res.status(401).json({ error: "Unauthorized " });
-    } else {
         res.json(opd)
-    }
 }
 
 exports.getOPDs = async (req, res) => {
@@ -115,6 +146,14 @@ exports.getOPDs = async (req, res) => {
   }
     res.json(opd);
 };
+
+exports.getOPDByDoctor = async(req, res) => {
+  const opd = await OPD.find({doctor:req.query.d_id})
+  if (!opd) {
+    return res.status(404).json({ error: "OPD not found" });
+  }
+  res.json(opd);
+}
 
 exports.availability = async (req, res) => {
    const opd = await OPD.findById(req.query.opd_id).populate(

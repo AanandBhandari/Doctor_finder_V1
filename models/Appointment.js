@@ -9,9 +9,6 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    endtime: {
-        type: String,
-    },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'user',
@@ -33,7 +30,7 @@ const appointmentSchema = new mongoose.Schema({
     },
     status:{
         type: String,
-        enum: ['active','canceled','complete']
+        enum: ['inactive','active','canceled','complete']
     }
 });
 
