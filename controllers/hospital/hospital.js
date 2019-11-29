@@ -20,11 +20,11 @@ exports.getProfile = async(req,res) => {
 // create profile
 exports.createProfile = async(req,res) => {
     const {address,website,phoneno} = req.body
-    let profile =await Hospital.findOne({_id:req.hospital._id, address})
+    let profile =await Hospital.findOne({_id:req.hospital._id, phoneno})
     if (profile) {
-        return res.status(403).json({
-          error: "Profile is already added!"
-        });
+      return res.status(403).json({
+        error: "Profile is already added!"
+      });
     }
     profile = req.hospital
     profile.address = address
@@ -73,26 +73,14 @@ exports.setOPD = async(req,res) => {
     // checks for available time span
     if(opds.length >= 1) {
       let isAvailable = false;
-      // function calculateDiff(starttime,endtime) {
-      //   let timeStart = new Date("01/01/2019 " + starttime);
-      //   let timeEnd = new Date("01/01/2019 " + endtime);
-      //   let diff = (timeEnd - timeStart) / 60000;
-      //   let minutes = diff % 60;
-      //   let hours = (diff - minutes) / 60;
-      //   console.log(hours);
-      //   return hours
-      // }
       for (let i = 0; i < opds.length; i++) {
         let opd = opds[i];
          isAvailable =
            ((+req.body.starttime > opd.starttime &&
              +req.body.starttime > opd.endtime) ||
            (+req.body.endtime < opd.starttime &&
-             +req.body.endtime < opd.endtime));  
-              
+             +req.body.endtime < opd.endtime))
       }
-      
-      console.log(isAvailable);
       if (isAvailable) {
         let newOPD = req.body
         newOPD.doctor = doctor._id
@@ -107,6 +95,8 @@ exports.setOPD = async(req,res) => {
     let newOPD = req.body;
     newOPD.doctor = doctor._id;
     newOPD.hospital = req.hospital._id;
+    req.hospital.doctors.unshift(doctor._id)
+    req.hospital.save()
     newOPD = new OPD(newOPD);
     newOPD = await newOPD.save();
     res.json(newOPD);
@@ -121,6 +111,13 @@ exports.deleteOPD = async(req,res) => {
     if (opd.hospital.toString() !== req.hospital._id.toString()) {
         return res.status(401).json({ error: "Unauthorized" });
     }
+    // remove index
+    const removeIndex = req.hospital.doctors.map(doctor =>
+      doctor.toString().indexOf(opd.doctor)
+    );
+    // return res.send(removeIndex)
+    req.hospital.doctors.splice(removeIndex, 1);
+    await req.hospital.save();
     await opd.remove();
     res.json({ msg: "OPD removed" });
 }
@@ -139,7 +136,7 @@ exports.getOPD = async(req,res) => {
 exports.getOPDs = async (req, res) => {
   const opd = await OPD.find({ hospital: req.hospital._id }).populate(
     "doctor",
-    "_id name lastname email professionaltitle image specialities"
+    "_id name lastname email professionaltitle image specialities isAvailable"
   );
   if (!opd) {
     return res.status(404).json({ error: "No OPDs" });
@@ -148,9 +145,18 @@ exports.getOPDs = async (req, res) => {
 };
 
 exports.getOPDByDoctor = async(req, res) => {
-  const opd = await OPD.find({doctor:req.query.d_id})
+  const opd = await OPD.find({ doctor: req.query.d_id }).populate(
+    "doctor",
+    "_id isAvailable"
+  );
   if (!opd) {
     return res.status(404).json({ error: "OPD not found" });
+  }
+  if (!opd.isAvailable) {
+    return res.status(404).json({ error: "OPD is not available at the moment" });
+  }
+  if (!opd.doctor.isAvailable) {
+    return res.status(404).json({ error: "Doctor is not available at the moment" });
   }
   res.json(opd);
 }
@@ -171,3 +177,9 @@ exports.availability = async (req, res) => {
         res.json(opd.isAvailable)
     }
 };
+exports.getHos = async(req,res) => {
+  const hospitals = await Hospital.find({}).select(
+    "-password -salt -createdAt"
+  );
+  res.json(hospitals)
+}

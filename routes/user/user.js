@@ -7,6 +7,10 @@ const {
   getProfile,
   updateProfile,
   addLocation,
+  getDoctorsByLocation,
+  getDoctorBySpecialities,
+  getDoctorByAddress,
+  getDoctorBySymptoms,
   postReview
 } = require("../../controllers/user/user");
 const { validateGeolocation } = require("../../validator/index");
@@ -23,7 +27,12 @@ router.put(
   addLocation
 );
 
-// take appointment
+// search doctors
+// by geolocation 
+router.get('/user/getDoctorsByGeoLocation/:id',validateGeolocation,auth,hasAuthorization,getDoctorsByLocation)
+router.get("/getDoctorsBySpecialities",getDoctorBySpecialities);
+router.get("/getDoctorByAddress", getDoctorByAddress);
+router.get("/getDoctorBySymptoms", getDoctorBySymptoms);
 
 
 // user reviews doctor

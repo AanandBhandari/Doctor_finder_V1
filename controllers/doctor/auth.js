@@ -10,29 +10,29 @@ exports.signup = async (req, res) => {
                 error: "Email is taken!"
             });
         let doctor = new Doctor(req.body);
-        doctor.isRegistred = false;
+        // doctor.isRegistred = false;
         doctor = await doctor.save();
         const token = jwt.sign(
             { _id: doctor._id },
             process.env.JWT_EMAIL_VERIFICATION_KEY,
             { expiresIn: 60 * 3600 }
         );
-        await emailVerify(req.body.email, req.body.name, token, 'doctor')
+        // await emailVerify(req.body.email, req.body.name, token, 'doctor')
         res
             .status(200)
             .json({
                 msg: `Follow the link provided to ${req.body.email} to completely register your account.`
             });
-        setTimeout(async () => {
-            const doctor = await Doctor.findOne({ email: req.body.email });
-            !doctor.isRegistred && (await Doctor.deleteOne({ _id: doctor._id }));
-            doctor.isRegistred &&
-                (await Doctor.updateOne(
-                    { _id: doctor._id },
-                    { $unset: { isRegistred: "" } },
-                    { multi: false }
-                ));
-        }, 1000 * 60);
+        // setTimeout(async () => {
+        //     const doctor = await Doctor.findOne({ email: req.body.email });
+        //     !doctor.isRegistred && (await Doctor.deleteOne({ _id: doctor._id }));
+        //     doctor.isRegistred &&
+        //         (await Doctor.updateOne(
+        //             { _id: doctor._id },
+        //             { $unset: { isRegistred: "" } },
+        //             { multi: false }
+        //         ));
+        // }, 1000 * 60);
     } catch (error) {
         res
             .status(500)
