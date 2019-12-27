@@ -1,7 +1,10 @@
 const User = require("../../models/User");
 const Doctor = require("../../models/Doctor");
 const Hospital = require("../../models/Hospital");
+const OPD = require("../../models/OPD");
 const Review = require("../../models/Review");
+const Appointment = require("../../models/Appointment");
+const Timemanage = require("../../models/Timemanage")
 const {calculateDistance,predict} = require("../../helpers")
 const perPage = 10;
 exports.profile = async (req, res, next) => {
@@ -85,6 +88,7 @@ exports.getDoctorsByLocation = async(req, res) => {
       "doctors",
       "_id name lastname image professionaltitle specialities"
     );
+    console.log(hospitals);
     // res.send(hospitals)
     if (hospitals.length === 0) {
     return res.status(400).json({ error: `No doctors found within ${req.query.d} km` });
@@ -145,11 +149,81 @@ exports.getDoctorBySymptoms = async (req, res) => {
     .skip(perPage * page - perPage)
     .limit(perPage)
     .select("_id name lastname image professionaltitle specialities")
-   if (doctors.length === 0) {
+   if (doctors.length < 1) {
      return res.status(400).json({ error: "No doctor found" });
    }
    res.json(doctors);
 };
+
+// appointment
+exports.createApointment = async(req,res) => {
+  let {hr,min} = req.body
+  hr = +hr
+  min = +min
+  const opds = await OPD.find({doctor:req.query.d_id, isAvailable:true})
+  if (opds.length < 1) {
+    return res.status(400).json({error: 'OPD not available at the moment'})
+  }
+  let opd = opds.filter(opd =>{
+    // console.log(typeof opd.starttime, typeof hr);
+    return (Number(opd.starttime)<=hr && Number(opd.endtime)>=hr)
+  })
+
+  if (opd.length !== 1) {
+    return res.status(400).json({ error: 'Please prefer another time' })
+  }
+  [opd] = opd
+  const {starttime,endtime, _id, timeslot} = opd 
+  const appointmentTime = await Timemanage.findOne({opd:_id})
+  if (!appointmentTime) {
+    return res.json({error: 'Time not available'})
+  }
+  if (hr-Number(starttime) < 0) {
+    return res.json({ error: 'Time not available..' })
+  }
+  const preferedTime = ((hr - Number(starttime))*60)+min
+  let start = 0
+  let end = Number(timeslot)
+  for (let i = 0; i < appointmentTime.bookedTime.length; i++) {
+    if (i>0) {
+      start = end
+      end += Number(timeslot)
+    }
+    if (end >= preferedTime && start <= preferedTime) {
+      if (appointmentTime.bookedTime[i]===0) {
+        // appointment can be done at prefered time
+        appointmentTime.bookedTime.set(i,"1")
+        let newAppointment = {
+          preferedtime : start+Number(starttime)*60,
+          user: req.user._id,
+          hospital: opd.hospital,
+          doctor: opd.doctor,
+          status: 'inactive'
+        }
+        await appointmentTime.save()
+        newAppointment = new Appointment(newAppointment)
+        newAppointment = await newAppointment.save()
+        res.json(newAppointment)
+        break;
+
+      } else {
+        res.json({ error: 'Time not available...' })
+        break;
+      }
+    }
+  }
+}
+
+exports.test = async(req,res) => {
+  let appointmentTime = await Timemanage.findOneAndUpdate({ opd: req.query.id },{})
+  appointmentTime.bookedTime.set(3,"1")
+  // res.json(appointmentTime)
+  appointmentTime.save((err,result)=>{
+    console.log(err);
+    console.log(result);
+    res.json(result)
+  })
+}
 
 // review a doctor
 exports.postReview = async(req,res) => {

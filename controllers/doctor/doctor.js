@@ -140,8 +140,9 @@ exports.removeAwards = async(req,res) => {
 
 // get Doctors
 exports.getDoctors = async(req,res) => {
+    
     const doctors = await Doctor.find({}).select(
-      "_id name lastname email professionaltitle image specialities"
+      "_id name lastname email professionaltitle image specialities isAvailable"
     );
     if(!doctors) {
         return res.status(400).json({error:" No doctors available"})

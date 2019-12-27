@@ -11,6 +11,8 @@ const {
   getDoctorBySpecialities,
   getDoctorByAddress,
   getDoctorBySymptoms,
+  createApointment,
+  test,
   postReview
 } = require("../../controllers/user/user");
 const { validateGeolocation } = require("../../validator/index");
@@ -28,12 +30,15 @@ router.put(
 );
 
 // search doctors
-// by geolocation 
 router.get('/user/getDoctorsByGeoLocation/:id',validateGeolocation,auth,hasAuthorization,getDoctorsByLocation)
 router.get("/getDoctorsBySpecialities",getDoctorBySpecialities);
 router.get("/getDoctorByAddress", getDoctorByAddress);
 router.get("/getDoctorBySymptoms", getDoctorBySymptoms);
 
+
+// appointment
+router.post('/user/createApointment/',auth, createApointment)
+router.put('/test',test)
 
 // user reviews doctor
 router.route("/user/review/:id")

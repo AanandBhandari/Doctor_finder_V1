@@ -5,11 +5,13 @@ const opdSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    // need to change in number
     startdayofweek: {
         type: String,
         required: true,
         enum: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
     },
+    // need to change in nunber
     enddayofweek: {
         type: String,
         required: true,

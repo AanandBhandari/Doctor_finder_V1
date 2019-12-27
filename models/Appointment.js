@@ -9,6 +9,7 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // dreferedDate need to be added
     user: {
         type: Schema.Types.ObjectId,
         ref: 'user',
@@ -22,11 +23,6 @@ const appointmentSchema = new mongoose.Schema({
     doctor: {
         type: Schema.Types.ObjectId,
         ref: 'doctor',
-    },
-    isAvailable: {
-        type: Boolean,
-        required: true,
-        default: false
     },
     status:{
         type: String,
