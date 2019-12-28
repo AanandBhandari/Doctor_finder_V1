@@ -63,6 +63,17 @@ exports.addLocation = async (req, res) => {
 
 // set OPD
 exports.setOPD = async(req,res) => {
+  let {startdate,enddate} = req.body
+  // need to init with 12am i.e from the vry beginning of the day
+  startdate = new Date(startdate)
+  enddate = new Date(enddate)
+  let now = Date.now()
+  if (startdate.getTime() < now) {
+    return res.status(400).json({error: "Start date should be from next day"})
+  }
+  if (startdate.getTime() > enddate.getTime() ) {
+    return res.status(400).json({ error: "Start date should be smaller than end date" })
+  }
     const doctor = await Doctor.findById(req.query.d_id)
     if (!doctor) {
         return res.status(400).json({error: 'Doctor not found'})
@@ -72,8 +83,14 @@ exports.setOPD = async(req,res) => {
     }
     const opds = await OPD.find({doctor: doctor._id})
     async function Init0(newOPD) {
-      const { starttime, endtime, _id,timeslot } = newOPD
+      const { starttime, endtime, _id, timeslot, startdate, enddate } = newOPD
+      // find number of available interval for a day
       const noOfTimeInterval = ((Number(endtime) - Number(starttime)) * 60) / Number(timeslot)
+      // find no of days to init booked time with zero for those days 
+      const getMillis = new Date(enddate).getTime() - new Date(startdate).getTime()
+      const noofDays = Math.floor(getMillis / (1000 * 3600 * 24))
+      console.log(noofDays);
+
       const bookedTime = new Array(noOfTimeInterval).fill(0)
       let timemanage = {
         opd: _id,
@@ -109,7 +126,7 @@ exports.setOPD = async(req,res) => {
           await req.hospital.save()
         }
         // init available time interval with 0 value in Timemanage
-        Init0(newOPD)
+        await Init0(newOPD)
         return res.json(newOPD)
       } else {
         return res.status(400).json({ error: "Time span is not available" });
@@ -122,7 +139,7 @@ exports.setOPD = async(req,res) => {
       await req.hospital.save()
       newOPD = new OPD(newOPD);
       newOPD = await newOPD.save();
-      Init0(newOPD)
+      await Init0(newOPD)
       res.json(newOPD);
     }
 }

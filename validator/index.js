@@ -81,13 +81,13 @@ exports.validateData = async(req,res,next) => {
 
 exports.validateOPD = async(req,res,next) => {
      req
-       .check("startdayofweek", "Startdayofweek is not valid")
+       .check("startdate", "Startdate is not valid")
        .notEmpty()
-       .isIn(["sun", "mon","tue", "wed","thu","fri","sat"])
+       .isISO8601()
     req
-        .check("enddayofweek", "Enddayofweek is not valid")
+        .check("enddate", "Enddate is not valid")
         .notEmpty()
-        .isIn(["sun", "mon", "tue", "wed", "thu", "fri", "sat"])
+        .isISO8601()
     req
         .check("starttime", "Start time is required")
         .notEmpty()

@@ -88,8 +88,6 @@ exports.getDoctorsByLocation = async(req, res) => {
       "doctors",
       "_id name lastname image professionaltitle specialities"
     );
-    console.log(hospitals);
-    // res.send(hospitals)
     if (hospitals.length === 0) {
     return res.status(400).json({ error: `No doctors found within ${req.query.d} km` });
   }
@@ -104,6 +102,9 @@ exports.getDoctorsByLocation = async(req, res) => {
     return el;
       }
   });
+  if (results.length === 0) {
+    return res.status(400).json({ error: `No doctors found within ${req.query.d} km` });
+  }
   res.json(results);
 };
 
