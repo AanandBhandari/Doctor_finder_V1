@@ -65,6 +65,8 @@ exports.addLocation = async (req, res) => {
 exports.setOPD = async(req,res) => {
   let {startdate,enddate} = req.body
   // need to init with 12am i.e from the vry beginning of the day
+  // hello
+
   startdate = new Date(startdate)
   enddate = new Date(enddate)
   let now = Date.now()
