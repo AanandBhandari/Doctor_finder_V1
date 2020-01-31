@@ -83,11 +83,13 @@ exports.validateOPD = async(req,res,next) => {
      req
        .check("startdate", "Startdate is not valid")
        .notEmpty()
-       .isISO8601()
+       .isISO8601('yyyy-mm-dd')
+       req.sanitize('startdate').toDate()
     req
         .check("enddate", "Enddate is not valid")
         .notEmpty()
-        .isISO8601()
+        .isISO8601('yyyy-mm-dd')
+       req.sanitize('enddate').toDate()
     req
         .check("starttime", "Start time is required")
         .notEmpty()
