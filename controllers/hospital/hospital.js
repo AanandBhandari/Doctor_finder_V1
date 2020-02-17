@@ -83,6 +83,7 @@ exports.setOPD = async(req,res) => {
     }
     const opds = await OPD.find({doctor: doctor._id})
     async function Init0(newOPD) {
+      console.log('hello');
       const { starttime, endtime, _id, timeslot, startdate, enddate } = newOPD
       // find number of available interval for a day
       const noOfTimeInterval = ((Number(endtime) - Number(starttime)) * 60) / Number(timeslot)
