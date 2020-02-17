@@ -34,11 +34,11 @@ app.use("/api", require('./routes/user/auth'));
 app.use("/api", require('./routes/user/user'));
 
 // Error handling middleware
-app.use(function (err, req, res, next) {
-    return res.status(500).json({
-        error:"Something went wrong!"
-    });
-});
+// app.use(function (err, req, res, next) {
+//     return res.status(500).json({
+//         error:"Something went wrong!"
+//     });
+// });
 
 const port = process.env.PORT || 3001;
 

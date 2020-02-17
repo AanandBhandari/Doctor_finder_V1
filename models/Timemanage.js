@@ -7,7 +7,13 @@ const timemanageSchema = new mongoose.Schema({
         unique: true
     },
     // need to change bookedtime according no of days available
-    bookedTime: [Number]
+    bookedTime: [{
+        date : {
+            type: Date,
+            required: true
+        },
+        availabletimeslot: [Number]
+    }]
 });
 
 module.exports = mongoose.model("timemanage", timemanageSchema);

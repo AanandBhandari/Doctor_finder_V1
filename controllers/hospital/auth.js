@@ -77,7 +77,7 @@ exports.signin = async (req, res) => {
   const token = jwt.sign(
     payload,
     process.env.JWT_SIGNIN_KEY,
-    {expiresIn:"1h"}
+    {expiresIn:"10h"}
   );
 
   return res.json({ token });
