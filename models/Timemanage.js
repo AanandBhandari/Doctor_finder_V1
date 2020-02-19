@@ -6,7 +6,6 @@ const timemanageSchema = new mongoose.Schema({
         ref: 'opd',
         unique: true
     },
-    // need to change bookedtime according no of days available
     bookedTime: [{
         date : {
             type: Date,
