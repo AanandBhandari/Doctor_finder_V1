@@ -183,9 +183,6 @@ exports.createApointment = async (req, res) => {
   }
   [opd] = opd;
   const { starttime, endtime, _id, timeslot } = opd;
-  // if (time < Number(starttime)) {
-  //   return res.status(400).json({ error: "Time not available.." });
-  // }
   let appointmentTime = await Timemanage.findOne({
     opd: _id
   });
@@ -194,12 +191,12 @@ exports.createApointment = async (req, res) => {
   }
   // index that matchs prefered Date
   let index = appointmentTime.bookedTime.findIndex(a => {
-    let date = a.date.toISOString().slice(0, 10)
-    return date === req.body.date
-    })
-    if (index === -1) {
-      return res.status(400).json({ error: "Date not available" });
-    }
+    let date = a.date.toISOString().slice(0, 10);
+    return date === req.body.date;
+  });
+  if (index === -1) {
+    return res.status(400).json({ error: "Date not available" });
+  }
   const preferedTime = (hr - Number(starttime)) * 60 + min;
   let start = 0;
   let end = Number(timeslot);
@@ -222,9 +219,16 @@ exports.createApointment = async (req, res) => {
           doctor: opd.doctor,
           status: "inactive"
         };
-        await appointmentTime.save();
         newAppointment = new Appointment(newAppointment);
         newAppointment = await newAppointment.save();
+        newAppointment = await newAppointment
+          .populate("hospital", "-doctors -salt -password -createdAt")
+          .populate(
+            "doctor",
+            "name lastname email professionaltitle specialities"
+          )
+          .execPopulate();
+        await appointmentTime.save();
         res.json(newAppointment);
         break;
       } else {
@@ -234,6 +238,11 @@ exports.createApointment = async (req, res) => {
     }
   }
 };
+
+exports.cancleAppointment = async (req,res) => {
+  let appointment = await Appointment.findById(req.params.a_id)
+
+}
 
 exports.test = async (req, res) => {
   let appointmentTime = await Timemanage.findOneAndUpdate(

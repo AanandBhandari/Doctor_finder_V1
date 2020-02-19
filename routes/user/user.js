@@ -12,6 +12,7 @@ const {
   getDoctorByAddress,
   getDoctorBySymptoms,
   createApointment,
+  cancleAppointment,
   test,
   postReview
 } = require("../../controllers/user/user");
@@ -38,6 +39,7 @@ router.get("/getDoctorBySymptoms", getDoctorBySymptoms);
 
 // appointment
 router.post('/user/createApointment/',auth, createApointment)
+router.patch('/user/cancleAppointment/:id',auth,hasAuthorization,cancleAppointment)
 router.put('/test',test)
 
 // user reviews doctor
