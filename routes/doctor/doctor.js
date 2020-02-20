@@ -11,9 +11,9 @@ router
   .get(getProfile)
   .put(auth, hasAuthorization, uploadDoctorPhoto, updateProfile)
   .patch(auth, hasAuthorization, availability);//filps the availability
+router.put('/doctor/profile', auth, uploadDoctorPhoto,createProfile)
 router.get('/doctor/getdoctors',getDoctors)
 
-router.put('/doctor/profile', auth, uploadDoctorPhoto,createProfile)
 
 router.route("/doctor/workexp/:id")
   .put(auth, validateData, hasAuthorization, addWorkexp)

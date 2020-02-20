@@ -2,6 +2,7 @@ const Hospital = require("../../models/Hospital");
 const OPD = require("../../models/OPD");
 const Doctor = require("../../models/Doctor");
 const Timemanage = require("../../models/Timemanage");
+const Appointment = require("../../models/Appointment")
 exports.profile = async (req, res, next) => {
   const hospital = await Hospital.findById(req.params.id).select(
     "-password -salt"
@@ -262,4 +263,50 @@ exports.getHos = async (req, res) => {
     "-password -salt -createdAt"
   );
   res.json(hospitals);
+};
+
+exports.getAppointments = async(req,res) => {
+  const appointments = await Appointment.find({ hospital: req.hospital._id })
+    .populate("user", "-salt -password -createdAt")
+    .populate("doctor", " _id name lastname email professionaltitle specialities");
+  if (!appointments) {
+    return res.status(400).json({error: 'No appointments found'})
+  }
+  res.json(appointments)
+}
+exports.getAppointment = async(req,res) => {
+  const appointments = await Appointment.findById(req.query.a_id)
+    .populate("user", "-salt -password -createdAt")
+    .populate("doctor", " _id name lastname email professionaltitle specialities");
+  if (!appointments) {
+    return res.status(400).json({error: 'No appointments found'})
+  }
+  res.json(appointments)
+}
+
+exports.flipActiveStatus = async(req,res) => {
+  let appointment = await Appointment.findById(req.query.a_id)
+  if (!appointment) {
+    return res.status(400).json({error: 'No appointment found'})
+  }
+  console.log('befre if',appointment.status);
+  if(appointment.status ==='complete') return res.status(400).json({error: 'appoint has already been completed'})
+  if(appointment.status === 'inactive')appointment.status='active'
+  else if(appointment.status === 'active')appointment.status='inactive'
+  appointment = await appointment.save()
+  res.json(appointment)
+}
+exports.flipCompleteStatus = async (req, res) => {
+  let appointment = await Appointment.findById(req.query.a_id);
+  if (!appointment) {
+    return res.status(400).json({ error: "No appointment found" });
+  }
+  if (appointment.status === "inactive")
+    return res
+      .status(400)
+      .json({ error: "appointment is in inactive state, make it acitve first" });
+  if (appointment.status === "active") appointment.status = "complete";
+  else if (appointment.status === "complete") appointment.status = "active";
+  appointment = await appointment.save();
+  res.json(appointment);
 };

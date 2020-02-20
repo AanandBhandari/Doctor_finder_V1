@@ -199,8 +199,8 @@ exports.createApointment = async (req, res) => {
   if (index === -1) {
     return res.status(400).json({ error: "Date not available" });
   }
-  // need to loop over on those time slot available for the day 
-  // nd check if prefered time is already booked or not 
+  // need to loop over on those time slot available for the day
+  // nd check if prefered time is already booked or not
   // if not booked create appointment
   const preferedTime = (hr - Number(starttime)) * 60 + min;
   // increasing range according to opd timeslot
@@ -229,10 +229,10 @@ exports.createApointment = async (req, res) => {
         newAppointment = new Appointment(newAppointment);
         newAppointment = await newAppointment.save();
         newAppointment = await newAppointment
-          .populate("hospital", "-doctors -salt -password -createdAt")
+          .populate("hospital", "-salt -password -createdAt")
           .populate(
             "doctor",
-            "name lastname email professionaltitle specialities"
+            "_id name lastname email professionaltitle specialities"
           )
           .execPopulate();
         await appointmentTime.save();
@@ -246,9 +246,11 @@ exports.createApointment = async (req, res) => {
   }
 };
 
-exports.deleteAppointment = async (req,res) => {
-  let appointment = await Appointment.findById(req.query.a_id)
-                    .populate('opd','timeslot starttime')
+exports.deleteAppointment = async (req, res) => {
+  let appointment = await Appointment.findById(req.query.a_id).populate(
+    "opd",
+    "timeslot starttime"
+  );
   if (!appointment) {
     return res.status(400).json({ error: "no appointment found" });
   }
@@ -271,12 +273,14 @@ exports.deleteAppointment = async (req,res) => {
   const availabletimeslotIndex =
     (appointment.preferedtime - appointment.opd.starttime * 60) /
     appointment.opd.timeslot;
-  appointmentTime.bookedTime[index].availabletimeslot.set(availabletimeslotIndex,'0')
-  await appointment.remove()
-  await appointmentTime.save()
-  res.json({msg:'sucessfully removed appointment'})
-
-}
+  appointmentTime.bookedTime[index].availabletimeslot.set(
+    availabletimeslotIndex,
+    "0"
+  );
+  await appointment.remove();
+  await appointmentTime.save();
+  res.json({ msg: "sucessfully removed appointment" });
+};
 
 exports.test = async (req, res) => {
   let appointmentTime = await Timemanage.findOneAndUpdate(

@@ -13,6 +13,10 @@ const {
   getOPDs,
   getOPDByDoctor,
   availability,
+  getAppointments,
+  getAppointment,
+  flipActiveStatus,
+  flipCompleteStatus,
   getHos
 } = require("../../controllers/hospital/hospital");
 const {
@@ -38,6 +42,12 @@ router
   .delete(auth, hasAuthorization, deleteOPD) //?opd_id
   .patch(auth, hasAuthorization, availability);
 router.get('/hospital/opds/:id',auth,hasAuthorization,getOPDs)
+
+// appointment
+router.get('/hospital/getAppointments',auth,getAppointments)
+router.get("/hospital/getAppointment", auth, getAppointment)
+router.patch("/hospital/flipActiveStatus/:id", auth,hasAuthorization, flipActiveStatus)
+router.patch("/hospital/flipCompleteStatus/:id", auth,hasAuthorization, flipCompleteStatus)
 
 router.param('id',profile)
 module.exports = router
