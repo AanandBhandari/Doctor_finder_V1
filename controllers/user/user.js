@@ -327,4 +327,57 @@ exports.postReview = async (req, res) => {
   if (!doctor) {
     return res.status(400).json({ error: "Doctor not found with this id" });
   }
+  if (req.body.star>5 || req.body.star<1) {
+    return res.status(400).json({ error: "Rating should be in range of 0 and 5" });
+  }
+  let newReview = {
+    user: req.user._id,
+    doctor: doctor._id,
+    comment: req.body.comment,
+    star: req.body.star
+  };
+  newReview = new Review(newReview);
+  let savedReview = await newReview.save();
+  res.json(savedReview);
 };
+
+exports.getReviews = async (req, res) => {
+  const page = req.query.page || 1;
+  const doctor = await Doctor.findById(req.query.d_id);
+  if (!doctor) {
+    return res.status(400).json({ error: "Doctor not found with this id" });
+  }
+  const reviews = await Review.find({doctor: doctor._id})
+    .skip(perPage * page - perPage)
+    .limit(perPage)
+  if (reviews.length === 0) {
+    return res.status(400).json({ error: "No reviews found" });
+  }
+  res.json(reviews);
+};
+exports.averageRating = async(req,res) => {
+  const doctor = await Doctor.findById(req.query.d_id);
+  if (!doctor) {
+    return res.status(400).json({ error: "Doctor not found with this id" });
+  }
+  let stars = await Review.find({ doctor: doctor._id }).select('star');
+  let fiveStars=0,fourStars=0,threeStars=0,twoStars=0,oneStars=0;
+  stars.forEach(s =>{
+    if (s.star === 5) fiveStars += 1
+    if (s.star === 4) fourStars += 1
+    if (s.star === 3) threeStars += 1
+    if (s.star === 2) twoStars += 1
+    if (s.star === 1) oneStars += 1
+  })
+  let averageStar = (5*fiveStars + 4*fourStars + 3*threeStars + 2*twoStars + oneStars) /
+                    (fiveStars+fourStars+threeStars+twoStars+oneStars)
+  stars = {
+    fiveStars,
+    fourStars,
+    threeStars,
+    twoStars,
+    oneStars,
+    averageStar
+  }
+  res.json(stars)
+}

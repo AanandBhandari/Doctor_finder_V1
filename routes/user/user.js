@@ -16,7 +16,9 @@ const {
   getAppointments,
   deleteAppointment,
   test,
-  postReview
+  postReview,
+  getReviews,
+  averageRating
 } = require("../../controllers/user/user");
 const { validateGeolocation } = require("../../validator/index");
 
@@ -47,8 +49,10 @@ router.delete('/user/deleteAppointment/:id',auth,hasAuthorization,deleteAppointm
 router.put('/test',test)
 
 // user reviews doctor
-router.route("/user/review/:id")
-      .post(auth,hasAuthorization,postReview)
+router.route("/user/review")
+      .post(auth,postReview)
+router.get('/getReviews',getReviews)
+router.get("/getAverageRating", averageRating);
 // delete user account soon...
 router.param("id", profile);
 module.exports = router;

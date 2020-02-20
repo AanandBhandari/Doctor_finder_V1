@@ -13,7 +13,7 @@ const reviewSchema = mongoose.Schema({
         type: String
     },
     star: {
-        type: Number
+        type: Number,
     }
 });
 module.exports = mongoose.model('reviews', reviewSchema);
