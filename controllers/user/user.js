@@ -246,6 +246,31 @@ exports.createApointment = async (req, res) => {
   }
 };
 
+exports.getAppointments = async (req, res) => {
+  const appointments = await Appointment.find({ user: req.user._id })
+    .populate("hospital", "-salt -password -createdAt")
+    .populate(
+      "doctor",
+      " _id name lastname email professionaltitle specialities"
+    );
+  if (!appointments) {
+    return res.status(400).json({ error: "No appointments found" });
+  }
+  res.json(appointments);
+};
+exports.getAppointment = async (req, res) => {
+  const appointments = await Appointment.findById(req.query.a_id)
+    .populate("hospital", "-salt -password -createdAt")
+    .populate(
+      "doctor",
+      " _id name lastname email professionaltitle specialities"
+    );
+  if (!appointments) {
+    return res.status(400).json({ error: "No appointments found" });
+  }
+  res.json(appointments);
+};
+
 exports.deleteAppointment = async (req, res) => {
   let appointment = await Appointment.findById(req.query.a_id).populate(
     "opd",

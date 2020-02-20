@@ -12,6 +12,8 @@ const {
   getDoctorByAddress,
   getDoctorBySymptoms,
   createApointment,
+  getAppointment,
+  getAppointments,
   deleteAppointment,
   test,
   postReview
@@ -39,6 +41,8 @@ router.get("/getDoctorBySymptoms", getDoctorBySymptoms);
 
 // appointment
 router.post('/user/createApointment/',auth, createApointment)
+router.get("/user/getAppointments", auth, getAppointments);
+router.get("/user/getAppointment", auth, getAppointment);
 router.delete('/user/deleteAppointment/:id',auth,hasAuthorization,deleteAppointment)
 router.put('/test',test)
 

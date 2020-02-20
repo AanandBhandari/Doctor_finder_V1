@@ -289,8 +289,6 @@ exports.flipStatus = async(req,res) => {
   if (!appointment) {
     return res.status(400).json({error: 'No appointment found'})
   }
-  console.log('befre if',appointment.status);
-  // if(appointment.status ==='complete') return res.status(400).json({error: 'appoint has already been completed'})
   if (appointment.status === "inactive") appointment.status = "active";
   else if (appointment.status === "active") appointment.status = "complete";
   else if (appointment.status === "complete") appointment.status = "inactive";
