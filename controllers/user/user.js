@@ -173,23 +173,25 @@ exports.createApointment = async (req, res) => {
   if (opds.length < 1) {
     return res.status(400).json({ error: "OPD not available at the moment" });
   }
+  // filter if time is inbetween the ranges of opds
   let time = hr + min / 60;
   let opd = opds.filter(opd => {
     return Number(opd.starttime) <= time && Number(opd.endtime) >= time;
   });
-
+  // as filterd opds should be only one
   if (opd.length !== 1) {
     return res.status(400).json({ error: "Please prefer another time" });
   }
   [opd] = opd;
   const { starttime, endtime, _id, timeslot } = opd;
+  // now checking for if prefered time is booked or not from Timemanage model
   let appointmentTime = await Timemanage.findOne({
     opd: _id
   });
   if (!appointmentTime) {
     return res.status(400).json({ error: "Time not available at the moment" });
   }
-  // index that matchs prefered Date
+  // we need index of bookedTime that matchs prefered Date
   let index = appointmentTime.bookedTime.findIndex(a => {
     let date = a.date.toISOString().slice(0, 10);
     return date === req.body.date;
@@ -197,7 +199,11 @@ exports.createApointment = async (req, res) => {
   if (index === -1) {
     return res.status(400).json({ error: "Date not available" });
   }
+  // need to loop over on those time slot available for the day 
+  // nd check if prefered time is already booked or not 
+  // if not booked create appointment
   const preferedTime = (hr - Number(starttime)) * 60 + min;
+  // increasing range according to opd timeslot
   let start = 0;
   let end = Number(timeslot);
   let len = appointmentTime.bookedTime[index].availabletimeslot.length;
@@ -207,14 +213,15 @@ exports.createApointment = async (req, res) => {
       end += Number(timeslot);
     }
     if (end >= preferedTime && start <= preferedTime) {
-      // tyo booked time ko tyo time slot 0 chavane..
+      // tyo booked time ko tyo time slot 0 chavane matra appointment lina milne
       if (appointmentTime.bookedTime[index].availabletimeslot[i] === 0) {
-        // appointment can be done at prefered time
+        // appointment can be done now at prefered time
         appointmentTime.bookedTime[index].availabletimeslot.set(i, "1");
         let newAppointment = {
           date: req.body.date,
           preferedtime: start + Number(starttime) * 60,
           user: req.user._id,
+          opd: _id,
           hospital: opd.hospital,
           doctor: opd.doctor,
           status: "inactive"
@@ -239,8 +246,35 @@ exports.createApointment = async (req, res) => {
   }
 };
 
-exports.cancleAppointment = async (req,res) => {
-  let appointment = await Appointment.findById(req.params.a_id)
+exports.deleteAppointment = async (req,res) => {
+  let appointment = await Appointment.findById(req.query.a_id)
+                    .populate('opd','timeslot starttime')
+  if (!appointment) {
+    return res.status(400).json({ error: "no appointment found" });
+  }
+  let appointmentTime = await Timemanage.findOne({
+    opd: appointment.opd
+  });
+  if (!appointmentTime) {
+    return res.status(400).json({ error: "Time slots are not available" });
+  }
+  // we need index of bookedDate
+  let bookedDate = appointment.date.toISOString().slice(0, 10);
+  let index = appointmentTime.bookedTime.findIndex(a => {
+    let date = a.date.toISOString().slice(0, 10);
+    return date === bookedDate;
+  });
+  if (index === -1) {
+    return res.status(400).json({ error: "Invalid Date" });
+  }
+  // need to work on this index
+  const availabletimeslotIndex =
+    (appointment.preferedtime - appointment.opd.starttime * 60) /
+    appointment.opd.timeslot;
+  appointmentTime.bookedTime[index].availabletimeslot.set(availabletimeslotIndex,'0')
+  await appointment.remove()
+  await appointmentTime.save()
+  res.json({msg:'sucessfully removed appointment'})
 
 }
 

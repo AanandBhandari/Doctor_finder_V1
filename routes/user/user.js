@@ -12,7 +12,7 @@ const {
   getDoctorByAddress,
   getDoctorBySymptoms,
   createApointment,
-  cancleAppointment,
+  deleteAppointment,
   test,
   postReview
 } = require("../../controllers/user/user");
@@ -39,7 +39,7 @@ router.get("/getDoctorBySymptoms", getDoctorBySymptoms);
 
 // appointment
 router.post('/user/createApointment/',auth, createApointment)
-router.patch('/user/cancleAppointment/:id',auth,hasAuthorization,cancleAppointment)
+router.delete('/user/deleteAppointment/:id',auth,hasAuthorization,deleteAppointment)
 router.put('/test',test)
 
 // user reviews doctor

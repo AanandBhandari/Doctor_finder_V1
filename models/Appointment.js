@@ -25,11 +25,17 @@ const appointmentSchema = new mongoose.Schema({
   },
   doctor: {
     type: Schema.Types.ObjectId,
-    ref: "doctor"
+    ref: "doctor",
+    required: true
+  },
+  opd: {
+    type: Schema.Types.ObjectId,
+    ref: "opd",
+    required: true
   },
   status: {
     type: String,
-    enum: ["inactive", "active", "canceled", "complete"]
+    enum: ["inactive", "active", "complete"]
   }
 });
 
