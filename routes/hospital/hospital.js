@@ -15,8 +15,7 @@ const {
   availability,
   getAppointments,
   getAppointment,
-  flipActiveStatus,
-  flipCompleteStatus,
+  flipStatus,
   getHos
 } = require("../../controllers/hospital/hospital");
 const {
@@ -46,8 +45,7 @@ router.get('/hospital/opds/:id',auth,hasAuthorization,getOPDs)
 // appointment
 router.get('/hospital/getAppointments',auth,getAppointments)
 router.get("/hospital/getAppointment", auth, getAppointment)
-router.patch("/hospital/flipActiveStatus/:id", auth,hasAuthorization, flipActiveStatus)
-router.patch("/hospital/flipCompleteStatus/:id", auth,hasAuthorization, flipCompleteStatus)
+router.patch("/hospital/flipStatus/:id", auth,hasAuthorization, flipStatus)
 
 router.param('id',profile)
 module.exports = router

@@ -284,29 +284,16 @@ exports.getAppointment = async(req,res) => {
   res.json(appointments)
 }
 
-exports.flipActiveStatus = async(req,res) => {
+exports.flipStatus = async(req,res) => {
   let appointment = await Appointment.findById(req.query.a_id)
   if (!appointment) {
     return res.status(400).json({error: 'No appointment found'})
   }
   console.log('befre if',appointment.status);
-  if(appointment.status ==='complete') return res.status(400).json({error: 'appoint has already been completed'})
-  if(appointment.status === 'inactive')appointment.status='active'
-  else if(appointment.status === 'active')appointment.status='inactive'
+  // if(appointment.status ==='complete') return res.status(400).json({error: 'appoint has already been completed'})
+  if (appointment.status === "inactive") appointment.status = "active";
+  else if (appointment.status === "active") appointment.status = "complete";
+  else if (appointment.status === "complete") appointment.status = "inactive";
   appointment = await appointment.save()
   res.json(appointment)
 }
-exports.flipCompleteStatus = async (req, res) => {
-  let appointment = await Appointment.findById(req.query.a_id);
-  if (!appointment) {
-    return res.status(400).json({ error: "No appointment found" });
-  }
-  if (appointment.status === "inactive")
-    return res
-      .status(400)
-      .json({ error: "appointment is in inactive state, make it acitve first" });
-  if (appointment.status === "active") appointment.status = "complete";
-  else if (appointment.status === "complete") appointment.status = "active";
-  appointment = await appointment.save();
-  res.json(appointment);
-};
