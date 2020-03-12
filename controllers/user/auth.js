@@ -21,13 +21,13 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   const { email, password } = req.body;
   let user = await User.findByCredentials(email, password);
-  user.salt = undefined;
-  user.password = undefined;
   if (!user) {
     return res.status(400).json({
       error: "User with that email does not exist."
     });
   }
+  user.salt = undefined;
+  user.password = undefined;
 
   const payload = {
     _id: user.id,

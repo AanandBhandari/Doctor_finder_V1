@@ -61,18 +61,19 @@ exports.emailverify = async (req, res) => {
 exports.signin = async (req, res) => {
     const { email, password } = req.body;
     let doctor = await Doctor.findByCredentials(email, password)
-    doctor.salt = undefined
-    doctor.password = undefined
     if (!doctor) {
         return res.status(400).json({
             error: "Doctor with that email does not exist."
         });
     }
+    doctor.salt = undefined
+    doctor.password = undefined
 
     const payload = {
         _id: doctor.id,
         name: doctor.name,
-        email: doctor.email
+        email: doctor.email,
+        type: 'doctor'
     };
     const token = jwt.sign(
         payload,
