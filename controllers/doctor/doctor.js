@@ -46,7 +46,8 @@ exports.createProfile = async (req, res) => {
 }
 // update profile
 exports.updateProfile = async (req, res) => {
-    const { professionaltitle, specialities } = req.body;
+    const { professionaltitle, specialities ,name, lastname} = req.body;
+    let profile = req.profile
     if (req.file !== undefined) {
       const { filename: image } = req.file;
       //Compress image
@@ -55,16 +56,17 @@ exports.updateProfile = async (req, res) => {
         .jpeg({ quality: 100 })
         .toFile(path.resolve(req.file.destination, "resized", image))
       fs.unlinkSync(req.file.path);
-      req.body.image = "doctor/resized/" + image;
+      profile.image = "doctor/resized/" + image;
     }
-    let profile = req.profile
     if(professionaltitle) profile.professionaltitle = professionaltitle;
     if(specialities) profile.specialities = specialities;
-    if(req.body.image) profile.image = req.body.image
+    if (name) profile.name = name;
+    if (lastname) profile.lastname = lastname;
     profile = await profile.save();
     profile.salt = undefined;
     profile.password = undefined;
     res.json(profile);
+
 }
 
 // add workexp

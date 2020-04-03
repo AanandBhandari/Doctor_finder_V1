@@ -78,7 +78,7 @@ exports.signin = async (req, res) => {
     const token = jwt.sign(
         payload,
         process.env.JWT_SIGNIN_KEY,
-        { expiresIn: "1h" }
+        { expiresIn: '10h' }
     );
 
     return res.json({ token });
@@ -88,7 +88,6 @@ exports.signin = async (req, res) => {
 exports.auth = async (req, res, next) => {
     const token = req.header('x-auth-token');
     try {
-
         if (token) {
             const user = await parseToken(token)
             if (user._id) {
@@ -107,7 +106,6 @@ exports.auth = async (req, res, next) => {
     }
 }
 function parseToken(token) {
-    // console.log('parseToken in doctor/auth',token.split(' ')[1]);
     try {
         return jwt.verify(token, process.env.JWT_SIGNIN_KEY);
     } catch (error) {
