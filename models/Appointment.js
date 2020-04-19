@@ -35,7 +35,7 @@ const appointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["inactive", "active", "complete"]
+    enum: ["inactive", "active", "complete", "expire"]
   }
 });
 

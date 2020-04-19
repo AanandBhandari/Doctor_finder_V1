@@ -7,7 +7,7 @@ require("dotenv").config();
 const app = express();
 
 // Import helper methods
-const {dbConnection, apiRequest } = require("./helpers");
+const {dbConnection, apiRequest, every24Hr } = require("./helpers");
 
 // Database Connection
 dbConnection();
@@ -39,6 +39,8 @@ app.use("/api", require('./routes/user/user'));
 //         error:"Something went wrong!"
 //     });
 // });
+
+// every24Hr();
 
 const port = process.env.PORT || 3001;
 

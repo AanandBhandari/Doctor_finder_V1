@@ -5,12 +5,10 @@ const opdSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    // need to change in number
     startdate: {
         type: Date,
         required: true,
     },
-    // need to change in nunber
     enddate: {
         type: Date,
         required: true,

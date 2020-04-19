@@ -109,6 +109,7 @@ exports.setOPD = async (req, res) => {
       let date = new Date();
       const timeslotPerDay = new Array(noOfTimeInterval).fill(0);
       date.setDate(StartDate.getDate() + i);
+      date = date.toISOString().split('T')[0]
       let schedule = {
         date,
         availabletimeslot: timeslotPerDay
@@ -179,7 +180,7 @@ exports.setOPD = async (req, res) => {
 exports.deleteOPD = async (req, res) => {
   const opd = await OPD.findById(req.query.opd_id);
   if (!opd) {
-    return res.status(404).json({ error: "OPD not found" });
+    return res.status(400).json({ error: "OPD not found" });
   }
   if (opd.hospital.toString() !== req.hospital._id.toString()) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -202,44 +203,44 @@ exports.deleteOPD = async (req, res) => {
 };
 
 exports.getOPD = async (req, res) => {
-  const opd = await OPD.findById(req.query.opd_id).populate(
+  let opd = await OPD.findById(req.query.opd_id).populate(
     "doctor",
     "_id name lastname email professionaltitle image specialities"
   );
   if (!opd) {
-    return res.status(404).json({ error: "OPD not found" });
+    return res.status(400).json({ error: "OPD not found" });
   }
   res.json(opd);
 };
 
 exports.getOPDs = async (req, res) => {
-  const opd = await OPD.find({ hospital: req.hospital._id }).populate(
+  const opds = await OPD.find({ hospital: req.hospital._id }).populate(
     "doctor",
     "_id name lastname email professionaltitle image specialities isAvailable"
   );
-  if (!opd) {
-    return res.status(404).json({ error: "No OPDs" });
+  if (!opds) {
+    return res.status(400).json({ error: "No OPDs" });
   }
-  res.json(opd);
+  res.json(opds);
 };
 
 exports.getOPDByDoctor = async (req, res) => {
   const opds = await OPD.find({ doctor: req.query.d_id }).populate(
     "doctor",
     "_id isAvailable"
-  );
-  if (!opds) {
-    return res.status(404).json({ error: "OPD not found" });
-  }
-  const opdS = opds.filter(opd => {
-    return opd.isAvailable && opd.doctor.isAvailable;
-  });
-  if (opdS.length < 1) {
-    return res
-      .status(404)
-      .json({ error: "OPD is not available at the moment" });
-  }
-  res.json(opdS);
+    ).populate('hospital', 'name address location phoneno');
+    if (!opds) {
+      return res.status(400).json({ error: "No OPDs has been created yet." });
+    }
+    // const opdS = opds.filter(opd => {
+    //   return opd.isAvailable && opd.doctor.isAvailable;
+    // });
+    // if (opdS.length < 1) {
+    //   return res
+    //   .status(400)
+    //   .json({ error: "OPD is not available at the moment" });
+    // }
+  res.json(opds);
 };
 
 exports.availability = async (req, res) => {
@@ -248,8 +249,16 @@ exports.availability = async (req, res) => {
     "_id name lastname email professionaltitle image specialities"
   );
   if (!opd) {
-    return res.status(404).json({ error: "OPD not found" });
+    return res.status(400).json({ error: "OPD not found" });
   }
+  // if OPD expire
+  if (new Date(opd.enddate).getTime() + opd.endtime * 3600000 < (Date.now() + 6 * 3600000)){
+    if(opd.isAvailable){
+    opd.isAvailable = false
+    await opd.save()}
+    return res.status(400).json({error:'OPD has expire!, cannot be toggled'})
+  }
+
   if (opd.hospital.toString() !== req.hospital._id.toString()) {
     return res.status(401).json({ error: "Unauthorized " });
   } else {

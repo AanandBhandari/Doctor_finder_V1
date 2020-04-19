@@ -46,7 +46,7 @@ router.post('/user/createApointment/',auth, createApointment)
 router.get("/user/getAppointments", auth, getAppointments);
 router.get("/user/getAppointment", auth, getAppointment);
 router.delete('/user/deleteAppointment/:id',auth,hasAuthorization,deleteAppointment)
-router.put('/test',test)
+router.get('/test',test)
 
 // user reviews doctor
 router.route("/user/review")

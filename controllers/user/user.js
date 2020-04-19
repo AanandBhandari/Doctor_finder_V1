@@ -308,17 +308,40 @@ exports.deleteAppointment = async (req, res) => {
 };
 
 exports.test = async (req, res) => {
-  let appointmentTime = await Timemanage.findOneAndUpdate(
-    { opd: req.query.id },
-    {}
-  );
-  appointmentTime.bookedTime.set(3, "1");
-  // res.json(appointmentTime)
-  appointmentTime.save((err, result) => {
-    console.log(err);
-    console.log(result);
-    res.json(result);
-  });
+  let today = new Date().toISOString().split('T')[0]
+  let timeManage = await Timemanage.find({ "bookedTime.date": today })
+  // timeManage = timeManage.map((t, i) => {
+  //   return t.bookedTime.map((b, j) => {
+  //     if (b.date.toISOString().split('T')[0] === today) {
+  //       b.availabletimeslot.map(t => {
+  //         if (t === 0) {
+  //           t = null
+  //         }
+  //       })
+  //       // console.log(b);
+  //     }
+  //   })
+  // })
+  for (let i = 0; i < timeManage.length; i++) {
+    const element = timeManage[i];
+    for (let j = 0; j < element.bookedTime.length; j++) {
+      const bt = element.bookedTime[j];
+      if(bt.date.toISOString().split('T')[0]===today){
+        for (let k = 0; k < bt.availabletimeslot.length; k++) {
+          if (bt.availabletimeslot[k]===0) {
+            console.log(bt.availabletimeslot[k]);
+            bt.availabletimeslot.set(k,null)
+          }
+          
+        }
+      }
+      
+    }
+    
+    await element.save()
+  }
+  // console.log('---timemanage----');
+  res.json(timeManage);
 };
 
 // review a doctor
@@ -347,7 +370,7 @@ exports.getReviews = async (req, res) => {
   if (!doctor) {
     return res.status(400).json({ error: "Doctor not found with this id" });
   }
-  const reviews = await Review.find({doctor: doctor._id})
+  const reviews = await Review.find({doctor: doctor._id}).populate('user', 'name lastname')
     .skip(perPage * page - perPage)
     .limit(perPage)
   if (reviews.length === 0) {
@@ -369,15 +392,17 @@ exports.averageRating = async(req,res) => {
     if (s.star === 2) twoStars += 1
     if (s.star === 1) oneStars += 1
   })
-  let averageStar = (5*fiveStars + 4*fourStars + 3*threeStars + 2*twoStars + oneStars) /
-                    (fiveStars+fourStars+threeStars+twoStars+oneStars)
+  let totalRatingUsers = (fiveStars + fourStars + threeStars + twoStars + oneStars)
+  let averageStar = (5*fiveStars + 4*fourStars + 3*threeStars + 2*twoStars + oneStars) / totalRatingUsers
+                    
   stars = {
     fiveStars,
     fourStars,
     threeStars,
     twoStars,
     oneStars,
-    averageStar
+    averageStar,
+    totalRatingUsers
   }
   res.json(stars)
 }
